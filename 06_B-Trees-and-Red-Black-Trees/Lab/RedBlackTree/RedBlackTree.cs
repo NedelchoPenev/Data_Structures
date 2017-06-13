@@ -1,117 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class RedBlackTree<T> : IBinarySearchTree<T>
-    where T : IComparable
+public class RedBlackTree<T> : IBinarySearchTree<T> where T : IComparable
 {
     private const bool Red = true;
-
     private const bool Black = false;
 
     private Node root;
-
-    private RedBlackTree(Node node)
-    {
-        this.PreOrderCopy(node);
-    }
-
-    public RedBlackTree()
-    {
-    }
-
-    public void Insert(T element)
-    {
-        this.root = this.Insert(element, this.root);
-        this.root.Color = Black;
-    }
-
-    public bool Contains(T element)
-    {
-        Node current = this.FindElement(element);
-
-        return current != null;
-    }
-
-    public void EachInOrder(Action<T> action)
-    {
-        this.EachInOrder(this.root, action);
-    }
-
-    public IBinarySearchTree<T> Search(T element)
-    {
-        Node current = this.FindElement(element);
-
-        return new RedBlackTree<T>(current);
-    }
-
-    public void DeleteMin()
-    {
-        if (this.root == null)
-        {
-            throw new InvalidOperationException();
-        }
-
-        this.root = this.DeleteMin(this.root);
-    }
-
-    public IEnumerable<T> Range(T startRange, T endRange)
-    {
-        Queue<T> queue = new Queue<T>();
-
-        this.Range(this.root, queue, startRange, endRange);
-
-        return queue;
-    }
-
-    public virtual void Delete(T element)
-    {
-        if (this.root == null)
-        {
-            throw new InvalidOperationException();
-        }
-        this.root = this.Delete(element, this.root);
-    }
-
-    public void DeleteMax()
-    {
-        if (this.root == null)
-        {
-            throw new InvalidOperationException();
-        }
-
-        this.root = this.DeleteMax(this.root);
-    }
-
-    public int Count()
-    {
-        return this.Count(this.root);
-    }
-
-    public int Rank(T element)
-    {
-        return this.Rank(element, this.root);
-    }
-
-    public T Select(int rank)
-    {
-        Node node = this.Select(rank, this.root);
-        if (node == null)
-        {
-            throw new InvalidOperationException();
-        }
-
-        return node.Value;
-    }
-
-    public T Ceiling(T element)
-    {
-        return this.Select(this.Rank(element) + 1);
-    }
-
-    public T Floor(T element)
-    {
-        return this.Select(this.Rank(element) - 1);
-    }
 
     private Node FindElement(T element)
     {
@@ -171,7 +66,7 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
         {
             node = this.RotateRight(node);
         }
-        if (this.IsRed(node.Left) && this.IsRed(node.Right))
+        if (this.IsRed(node.Right) && this.IsRed(node.Left))
         {
             this.FlipColors(node);
         }
@@ -226,6 +121,50 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
         return node.Count;
     }
 
+    private RedBlackTree(Node node)
+    {
+        this.PreOrderCopy(node);
+    }
+
+    public RedBlackTree()
+    {
+    }
+
+    public void Insert(T element)
+    {
+        this.root = this.Insert(element, this.root);
+        this.root.Color = Black;
+    }
+
+    public bool Contains(T element)
+    {
+        Node current = this.FindElement(element);
+
+        return current != null;
+    }
+
+    public void EachInOrder(Action<T> action)
+    {
+        this.EachInOrder(this.root, action);
+    }
+
+    public IBinarySearchTree<T> Search(T element)
+    {
+        Node current = this.FindElement(element);
+
+        return new RedBlackTree<T>(current);
+    }
+
+    public void DeleteMin()
+    {
+        if (this.root == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        this.root = this.DeleteMin(this.root);
+    }
+
     private Node DeleteMin(Node node)
     {
         if (node.Left == null)
@@ -237,6 +176,24 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
         node.Count = 1 + this.Count(node.Left) + this.Count(node.Right);
 
         return node;
+    }
+
+    public IEnumerable<T> Range(T startRange, T endRange)
+    {
+        Queue<T> queue = new Queue<T>();
+
+        this.Range(this.root, queue, startRange, endRange);
+
+        return queue;
+    }
+
+    public virtual void Delete(T element)
+    {
+        if (this.root == null)
+        {
+            throw new InvalidOperationException();
+        }
+        this.root = this.Delete(element, this.root);
     }
 
     private Node Delete(T element, Node node)
@@ -271,6 +228,7 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
             node = this.FindMin(temp.Right);
             node.Right = this.DeleteMin(temp.Right);
             node.Left = temp.Left;
+
         }
         node.Count = this.Count(node.Left) + this.Count(node.Right) + 1;
 
@@ -287,6 +245,16 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
         return this.FindMin(node.Left);
     }
 
+    public void DeleteMax()
+    {
+        if (this.root == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        this.root = this.DeleteMax(this.root);
+    }
+
     private Node DeleteMax(Node node)
     {
         if (node.Right == null)
@@ -298,6 +266,16 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
         node.Count = 1 + this.Count(node.Left) + this.Count(node.Right);
 
         return node;
+    }
+
+    public int Count()
+    {
+        return this.Count(this.root);
+    }
+
+    public int Rank(T element)
+    {
+        return this.Rank(element, this.root);
     }
 
     private int Rank(T element, Node node)
@@ -322,6 +300,17 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
         return this.Count(node.Left);
     }
 
+    public T Select(int rank)
+    {
+        Node node = this.Select(rank, this.root);
+        if (node == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        return node.Value;
+    }
+
     private Node Select(int rank, Node node)
     {
         if (node == null)
@@ -339,7 +328,33 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
         {
             return this.Select(rank, node.Left);
         }
-        return this.Select(rank - (leftCount + 1), node.Right);
+        else
+        {
+            return this.Select(rank - (leftCount + 1), node.Right);
+        }
+    }
+
+    public T Ceiling(T element)
+    {
+
+        return this.Select(this.Rank(element) + 1);
+    }
+
+    public T Floor(T element)
+    {
+        return this.Select(this.Rank(element) - 1);
+    }
+
+    private bool IsRed(Node node)
+    {
+        return node?.Color == Red;
+    }
+
+    private void FlipColors(Node node)
+    {
+        node.Color = Red;
+        node.Left.Color = Black;
+        node.Right.Color = Black;
     }
 
     private Node RotateRight(Node node)
@@ -368,18 +383,6 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
         return temp;
     }
 
-    private void FlipColors(Node node)
-    {
-        node.Color = Red;
-        node.Left.Color = Black;
-        node.Right.Color = Black;
-    }
-
-    private bool IsRed(Node node)
-    {
-        return node?.Color == Red;
-    }
-
     private class Node
     {
         public Node(T value)
@@ -388,21 +391,21 @@ public class RedBlackTree<T> : IBinarySearchTree<T>
             this.Color = Red;
         }
 
-        public bool Color { get; set; }
-
         public T Value { get; }
-
         public Node Left { get; set; }
-
         public Node Right { get; set; }
 
         public int Count { get; set; }
+
+        public bool Color { get; set; }
     }
+
 }
 
 public class Launcher
 {
     public static void Main(string[] args)
     {
+
     }
 }

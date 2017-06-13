@@ -61,7 +61,7 @@ public class Hierarchy<T> : IHierarchy<T>
         Node nodeToRemove = this.nodesByValue[element];
         if (nodeToRemove.Equals(this.root))
         {
-            throw new InvalidOperationException();
+            throw new ArgumentException();
         }
 
         List<Node> children = nodeToRemove.Children;
@@ -84,6 +84,7 @@ public class Hierarchy<T> : IHierarchy<T>
         }
 
         Node parent = this.nodesByValue[item];
+        List<Node> children = parent.Children;
         return parent.Children.Select(n => n.Value).ToList();
     }
 
