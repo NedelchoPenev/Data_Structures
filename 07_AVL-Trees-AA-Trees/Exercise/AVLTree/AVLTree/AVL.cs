@@ -54,8 +54,7 @@ public class AVL<T> where T : IComparable<T>
 
                 if (temp == null)
                 {
-                    temp = node;
-                    node = null;
+                    return null;
                 }
                 else
                 {
@@ -68,11 +67,6 @@ public class AVL<T> where T : IComparable<T>
                 node.Value = temp.Value;
                 node.Right = this.Delete(node.Right, temp.Value);
             }
-        }
-
-        if (node == null)
-        {
-            return null;
         }
 
         node = this.Balance(node);
